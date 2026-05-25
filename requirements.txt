@@ -1,0 +1,8 @@
+numpy>=1.22
+scipy>=1.9
+matplotlib>=3.5
+
+# Required only for the tcn_hybrid package (loading the trained TCN and
+# running inference). Skip if you only need the single-sensor AO baseline
+# in the ao_gait_phase package.
+torch>=2.0

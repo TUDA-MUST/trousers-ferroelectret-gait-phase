@@ -1,0 +1,45 @@
+cff-version: 1.2.0
+message: "If you use this software in academic work, please cite the paper below."
+title: "ao_gait_phase: Adaptive Oscillator Gait Phase Estimator"
+abstract: >
+  Minimal real-time single-sensor adaptive-oscillator gait phase estimator
+  with event-triggered phase correction. Reference implementation for the
+  paper "Hybrid Adaptive Oscillator and Temporal Convolutional Network
+  Estimator for Textile-Integrated Gait Phase Sensing".
+authors:
+  - family-names: Seiler
+    given-names: Julian
+    affiliation: "Technische Universitaet Darmstadt"
+    email: julian.seiler@tu-darmstadt.de
+  - family-names: Suppelt
+    given-names: Marius
+    affiliation: "Technische Universitaet Darmstadt"
+  - family-names: Wilhelm
+    given-names: Ruth
+    affiliation: "Technische Universitaet Darmstadt"
+  - family-names: Beckerle
+    given-names: Philipp
+    affiliation: "Technische Universitaet Darmstadt"
+  - family-names: Kupnik
+    given-names: Mario
+    affiliation: "Technische Universitaet Darmstadt"
+license: MIT
+type: software
+preferred-citation:
+  type: article
+  title: >
+    Hybrid Adaptive Oscillator and Temporal Convolutional Network Estimator
+    for Textile-Integrated Gait Phase Sensing
+  authors:
+    - family-names: Seiler
+      given-names: Julian
+    - family-names: Suppelt
+      given-names: Marius
+    - family-names: Wilhelm
+      given-names: Ruth
+    - family-names: Beckerle
+      given-names: Philipp
+    - family-names: Kupnik
+      given-names: Mario
+  year: 2026
+  journal: "Measurement Science and Technology"
