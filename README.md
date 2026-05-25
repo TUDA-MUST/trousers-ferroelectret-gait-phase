@@ -3,8 +3,8 @@
 Reference implementation of the gait phase estimator described in:
 
 > Seiler, J., Suppelt, M., Wilhelm, R., Beckerle, P., Kupnik, M.
-> "Hybrid Adaptive Oscillator and Temporal Convolutional Network Estimator
-> for Textile-Integrated Gait Phase Sensing." (2026).
+> "Real-Time Gait Phase Estimation Based on Textile Integrated
+Ferroelectrets, Adaptive Oscillators and Temporal Convolutional Networks." (2026).
 
 The repository contains two Python packages:
 
