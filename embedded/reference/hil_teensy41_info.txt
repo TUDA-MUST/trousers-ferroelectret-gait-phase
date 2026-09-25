@@ -1,0 +1,1 @@
+INFO board=Teensy4.1 chip=IMXRT1062 cores=1 ram1=512KB(ITCM/DTCM) ram2=512KB(OCRAM) flash=8MB cpu=600MHz real=float sizeof(est)=492 sizeof(cao)=1308 fs=330.0 ao_N=4 tcn_ram_tapblocks=30/30 tcn_ram_kb=227 heap_free=176128 build=Sep  4 2026 20:01:54

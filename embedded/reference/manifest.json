@@ -1,0 +1,52 @@
+[
+  {
+    "name": "Ramp_60s",
+    "session": "S1",
+    "ferro_channel": 2,
+    "fs": 330.0,
+    "n": 106045,
+    "n_events": 310,
+    "speed_kmh": "4.0--6.5",
+    "protocol": "ramp"
+  },
+  {
+    "name": "Step_6.7_4.6",
+    "session": "S1",
+    "ferro_channel": 2,
+    "fs": 330.0,
+    "n": 75706,
+    "n_events": 250,
+    "speed_kmh": "6.7 / 4.6",
+    "protocol": "step_change"
+  },
+  {
+    "name": "Const_4.5",
+    "session": "S1",
+    "ferro_channel": 2,
+    "fs": 330.0,
+    "n": 75715,
+    "n_events": 201,
+    "speed_kmh": "4.5",
+    "protocol": "constant"
+  },
+  {
+    "name": "Ramp_60s_v2",
+    "session": "S2",
+    "ferro_channel": 1,
+    "fs": 330.0,
+    "n": 114737,
+    "n_events": 299,
+    "speed_kmh": "4.0--6.5",
+    "protocol": "ramp"
+  },
+  {
+    "name": "Ramp_30s",
+    "session": "S2",
+    "ferro_channel": 1,
+    "fs": 330.0,
+    "n": 54341,
+    "n_events": 153,
+    "speed_kmh": "4.0--6.5",
+    "protocol": "ramp"
+  }
+]

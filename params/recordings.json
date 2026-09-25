@@ -1,0 +1,82 @@
+{
+  "description": "The five recordings evaluated in the paper, as published on TUdatalib (DOI 10.48328/tudatalib-2246). Paths are relative to the dataset root (the folder that contains data/). Channels map the three muscle sites to the CSV columns; the wiring differs between sessions. Trims are applied after resampling to 330 Hz.",
+  "holdout_speeds_kmh": [4.5, 5.5],
+  "holdout_guard_s": 5.0,
+  "recordings": {
+    "Ramp_60s": {
+      "file": "data/session_01/S1_ramp_4.0-6.5_60s.csv",
+      "session": "S1",
+      "label": "S1 speed ramp, 60 s per step",
+      "channels": {"G": "ferro_3", "VM": "ferro_2", "RF": "ferro_1"},
+      "fsr_threshold_v": 1.25,
+      "trim_start_s": 54.0,
+      "trim_end_s": 4.0,
+      "protocol": "ramp",
+      "speeds_kmh": [4.0, 4.5, 5.0, 5.5, 6.0, 6.5],
+      "speed_duration_s": 60.0,
+      "tcn_training": true,
+      "drop_first_sample": false
+    },
+    "Step_6.7_4.6": {
+      "file": "data/session_01/S1_step_6.7-4.6.csv",
+      "session": "S1",
+      "label": "S1 constant 6.7 km/h",
+      "channels": {"G": "ferro_3", "VM": "ferro_2", "RF": "ferro_1"},
+      "fsr_threshold_v": 0.80,
+      "trim_start_s": 25.0,
+      "trim_end_s": 15.0,
+      "protocol": "const",
+      "speeds_kmh": [6.57],
+      "speed_duration_s": 229.0,
+      "tcn_training": false,
+      "drop_first_sample": false
+    },
+    "Const_4.5": {
+      "file": "data/session_01/S1_const_4.5.csv",
+      "session": "S1",
+      "label": "S1 constant 4.5 km/h",
+      "channels": {"G": "ferro_3", "VM": "ferro_2", "RF": "ferro_1"},
+      "fsr_threshold_v": 0.80,
+      "trim_start_s": 25.0,
+      "trim_end_s": 16.0,
+      "protocol": "const",
+      "speeds_kmh": [4.5],
+      "speed_duration_s": 240.0,
+      "tcn_training": false,
+      "drop_first_sample": false
+    },
+    "Ramp_60s_v2": {
+      "file": "data/session_02/S2_ramp_4.0-6.5_60s.csv",
+      "session": "S2",
+      "label": "S2 speed ramp, 60 s per step",
+      "channels": {"G": "ferro_2", "VM": "ferro_3", "RF": "ferro_4"},
+      "fsr_threshold_v": 0.50,
+      "trim_start_s": 25.0,
+      "trim_end_s": 5.0,
+      "protocol": "ramp",
+      "speeds_kmh": [4.0, 4.5, 5.0, 5.5, 6.0, 6.5],
+      "speed_duration_s": 60.0,
+      "tcn_training": true,
+      "drop_first_sample": true
+    },
+    "Ramp_30s": {
+      "file": "data/session_02/S2_ramp_4.0-6.5_30s.csv",
+      "session": "S2",
+      "label": "S2 speed ramp, 30 s per step",
+      "channels": {"G": "ferro_2", "VM": "ferro_3", "RF": "ferro_4"},
+      "fsr_threshold_v": 0.50,
+      "trim_start_s": 25.0,
+      "trim_end_s": 1.0,
+      "protocol": "ramp",
+      "speeds_kmh": [4.0, 4.5, 5.0, 5.5, 6.0, 6.5],
+      "speed_duration_s": 30.0,
+      "tcn_training": false,
+      "drop_first_sample": true
+    }
+  },
+  "notes": {
+    "drop_first_sample": "The paper's evaluation read the session-2 source files with a loader that skipped their first line as a header, although these files have none. The published CSVs keep that first sample. Setting drop_first_sample reproduces the paper's input exactly; scripts/reproduce.py --keep-first-sample runs on the complete files instead.",
+    "Step_6.7_4.6": "Named after the step-change protocol; the analysis window contains only the first speed (6.57 km/h), so the paper calls it the 6.7 km/h recording and treats it as constant speed.",
+    "RF saturation": "The S1 Rectus Femoris readout (ferro_1) is saturated for the whole S1 ramp and for most of the 6.7 km/h recording. The multi-sensor configurations use it as recorded, as in the paper."
+  }
+}

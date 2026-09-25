@@ -1,0 +1,10 @@
+=== gait phase estimator: ESP32 port ===
+INFO chip=ESP32-D0WDQ6 rev=1 cores=2 cpu=240MHz real=double sizeof(est)=960 fs=330.0 ao_N=4 flash=4096KB heap_free=291228 build=Sep  4 2026 18:05:08
+SELFTEST Ramp_60s  n=6600  real=double  cpu=240 MHz
+  cycles/sample  min 79924  median 112579  mean 112325  p99 122707  max 216949
+  us/sample      min 333.02  median 469.08  mean 468.02  p99 511.28  max 903.95
+  load @ 330 Hz  mean 15.44 %  p99 16.87 %  max 29.83 %  (period 3030 us)
+  wall time      3104.7 ms for 20.0 s of signal (6.4x real time)
+  vs python ref  MAE 0.000e+00 rad  RMSE 0.000e+00 rad  max 0.000e+00 rad  events 17 (ref 17)
+READY
+INFO chip=ESP32-D0WDQ6 rev=1 cores=2 cpu=240MHz real=double sizeof(est)=960 fs=330.0 ao_N=4 flash=4096KB heap_free=290964 build=Sep  4 2026 18:05:08

@@ -1,0 +1,39 @@
+{
+  "description": "Optimized estimator parameters (paper Table 1) at full precision. The adaptive-oscillator rates and the correction gain come from 200 TPE trials on the first 60 s of the S1 speed ramp (4.0 km/h); the phase offset is the closed-form value of that optimization. The event-detector parameters come from a separate run of 150 trials on the complete S1 speed ramp.",
+  "sampling_rate_hz": 330.0,
+  "bandpass": {
+    "highpass_hz": 0.5,
+    "highpass_order": 1,
+    "lowpass_hz": 15.0,
+    "lowpass_order": 4
+  },
+  "adaptive_oscillator": {
+    "N": 4,
+    "nu_phi": 0.9501658222719294,
+    "nu_omega": 0.24370958078477165,
+    "eta": 1.592840268715275,
+    "omega_init_hz": 0.9,
+    "alpha_init": 0.01,
+    "omega_min_rad_s": 0.1
+  },
+  "phase_error_learner": {
+    "kp": 1.2050152279950668,
+    "phase_offset_rad": -0.43542803919770107,
+    "event_ref_phase_rad": 0.0
+  },
+  "event_detector": {
+    "env_alpha": 0.0011429996591265945,
+    "k_env": 1.0929644559084108,
+    "k_std": 0.8046603457722377,
+    "min_stride_fraction": 0.7967219244187553,
+    "direction": "neg"
+  },
+  "coupling": {
+    "kappa": 0.25,
+    "quality_weighted": true
+  },
+  "fsr_reference": {
+    "lowpass_hz": 10.0,
+    "order": 6
+  }
+}

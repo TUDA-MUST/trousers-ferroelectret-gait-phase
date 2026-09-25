@@ -1,45 +1,61 @@
 cff-version: 1.2.0
-message: "If you use this software in academic work, please cite the paper below."
-title: "ao_gait_phase: Adaptive Oscillator Gait Phase Estimator"
-abstract: >
-  Minimal real-time single-sensor adaptive-oscillator gait phase estimator
-  with event-triggered phase correction. Reference implementation for the
-  paper "Hybrid Adaptive Oscillator and Temporal Convolutional Network
-  Estimator for Textile-Integrated Gait Phase Sensing".
+message: "If you use this code, please cite the article below."
+title: "trousers-ferroelectret-gait-phase: adaptive continuous gait phase estimation from textile-integrated ferroelectret sensors"
+repository-code: "https://github.com/TUDA-MUST/trousers-ferroelectret-gait-phase"
+type: software
+license: MIT
+version: 1.0.0
 authors:
   - family-names: Seiler
     given-names: Julian
-    affiliation: "Technische Universitaet Darmstadt"
-    email: julian.seiler@tu-darmstadt.de
+    orcid: "https://orcid.org/0009-0008-3122-7810"
+    affiliation: "Measurement and Sensor Technology Group, TU Darmstadt"
   - family-names: Suppelt
-    given-names: Marius
-    affiliation: "Technische Universitaet Darmstadt"
+    given-names: Mark
+    orcid: "https://orcid.org/0000-0003-4954-7229"
+    affiliation: "Measurement and Sensor Technology Group, TU Darmstadt"
   - family-names: Wilhelm
     given-names: Ruth
-    affiliation: "Technische Universitaet Darmstadt"
+    orcid: "https://orcid.org/0009-0002-0830-8176"
+    affiliation: "Measurement and Sensor Technology Group, TU Darmstadt"
   - family-names: Beckerle
     given-names: Philipp
-    affiliation: "Technische Universitaet Darmstadt"
+    orcid: "https://orcid.org/0000-0001-5703-6029"
+    affiliation: "Chair of Autonomous Systems and Mechatronics, FAU Erlangen-Nürnberg"
   - family-names: Kupnik
     given-names: Mario
-    affiliation: "Technische Universitaet Darmstadt"
-license: MIT
-type: software
+    orcid: "https://orcid.org/0000-0003-2287-4481"
+    affiliation: "Measurement and Sensor Technology Group, TU Darmstadt"
+# Volume, pages and DOI of the article are added on publication.
 preferred-citation:
   type: article
-  title: >
-    Hybrid Adaptive Oscillator and Temporal Convolutional Network Estimator
-    for Textile-Integrated Gait Phase Sensing
+  title: "Adaptive Continuous Gait Phase Estimation from Textile-Integrated Ferroelectret Sensors"
+  journal: "Bioinspiration & Biomimetics"
+  year: 2026
   authors:
     - family-names: Seiler
       given-names: Julian
     - family-names: Suppelt
-      given-names: Marius
+      given-names: Mark
     - family-names: Wilhelm
       given-names: Ruth
     - family-names: Beckerle
       given-names: Philipp
     - family-names: Kupnik
       given-names: Mario
-  year: 2026
-  journal: "Measurement Science and Technology"
+references:
+  - type: dataset
+    title: "Wearable Ferroelectret Force Myography Dataset for Gait Phase Estimation"
+    doi: "10.48328/tudatalib-2246"
+    license: CC-BY-4.0
+    authors:
+      - family-names: Seiler
+        given-names: Julian
+      - family-names: Suppelt
+        given-names: Mark
+      - family-names: Wilhelm
+        given-names: Ruth
+      - family-names: Beckerle
+        given-names: Philipp
+      - family-names: Kupnik
+        given-names: Mario

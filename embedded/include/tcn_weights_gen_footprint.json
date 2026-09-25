@@ -1,0 +1,23 @@
+{
+  "params_trained": 71099,
+  "params_deployed": 58907,
+  "params_pruned": 11520,
+  "pruned_frac": 0.162,
+  "mac_per_sample_streaming": 58560,
+  "mac_per_sample_unpruned": 70080,
+  "activation_floats": 18351,
+  "activation_kb_fp32": 71.7,
+  "weights_kb_fp32": 230.1,
+  "layer_depths": [
+    5,
+    9,
+    17,
+    33,
+    65,
+    129,
+    129
+  ],
+  "window_samples": 167,
+  "window_s": 1.518,
+  "nominal_rf_samples": 893
+}

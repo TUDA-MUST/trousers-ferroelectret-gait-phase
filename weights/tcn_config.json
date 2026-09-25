@@ -1,0 +1,44 @@
+{
+  "description": "Paper networks (held-out-speed models): trained on the two 60 s speed ramps (S1 and S2) with the 4.5 and 5.5 km/h steps, plus 5 s on either side, removed from the training set (42,795 samples at 110 Hz). Seed 0. PyTorch state_dicts, load with torch.load(..., weights_only=True).",
+  "architecture": {
+    "type": "causal dilated TCN (Bai et al. 2018): GroupNorm(1, 3) input, 7 causal conv layers with BatchNorm, ReLU, dropout, identity skip in layers 2-7, linear heads on the last time step",
+    "n_inputs": 3,
+    "input_order": ["G", "VM", "RF"],
+    "input_signal": "causal bandpass (0.5-15 Hz) ferroelectret signal in volts, 330 Hz downsampled by 3 (every third sample)",
+    "input_rate_hz": 110.0,
+    "downsample_factor": 3,
+    "window_samples": 167,
+    "n_filters": 48,
+    "kernel_size": 5,
+    "dilations": [1, 2, 4, 8, 16, 64, 128],
+    "dropout": 0.2
+  },
+  "models": {
+    "hybrid": {
+      "file": "tcn_hybrid_7L48f.pt",
+      "class": "MultiHeadTCN",
+      "heads": {"head_abs": "[sin, cos] absolute phase", "head_add": "[sin, cos] additive correction to the C-AO phase", "head_conf": "confidence logit (sigmoid)"},
+      "n_parameters": 71099,
+      "sha256": "17320aec2b00c6c38fbf249ab9d9330cbfb71dd90594eb2e6fb0956079afb297"
+    },
+    "standalone": {
+      "file": "tcn_standalone_7L48f.pt",
+      "class": "AbsoluteTCN",
+      "heads": {"head_abs": "[sin, cos] absolute phase"},
+      "n_parameters": 70952,
+      "sha256": "fe78496948451ea57f8a7062e8d8f2796c621ddda91d8147640e26177fce594f"
+    }
+  },
+  "training": {
+    "recordings": ["Ramp_60s", "Ramp_60s_v2"],
+    "holdout_speeds_kmh": [4.5, 5.5],
+    "holdout_guard_s": 5.0,
+    "n_training_samples": 42795,
+    "loss": "L_abs + L_add + 0.5 L_conf (squared sin/cos errors per valid sample; confidence target 1/(1+|dphi|))",
+    "optimizer": "Adam, lr 3e-3, weight decay 1e-5, gradient clipping at norm 1",
+    "schedule": "OneCycleLR (peak 3e-3, pct_start 0.1, cosine), 300 epochs, batch 1024",
+    "augmentation": "per-channel amplitude scaling U[0.05, 5], 10 % channel dropout, Gaussian noise sigma 0.01",
+    "checkpoint": "epoch with the lowest training loss",
+    "seed": 0
+  }
+}

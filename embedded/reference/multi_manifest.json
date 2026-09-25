@@ -1,0 +1,67 @@
+[
+  {
+    "name": "Ramp_60s",
+    "session": "S1",
+    "channels": {
+      "G": 2,
+      "VM": 1,
+      "RF": 0
+    },
+    "n": 106045,
+    "n_ds": 35349,
+    "fs": 330.0,
+    "n_events": 310
+  },
+  {
+    "name": "Step_6.7_4.6",
+    "session": "S1",
+    "channels": {
+      "G": 2,
+      "VM": 1,
+      "RF": 0
+    },
+    "n": 75706,
+    "n_ds": 25236,
+    "fs": 330.0,
+    "n_events": 250
+  },
+  {
+    "name": "Const_4.5",
+    "session": "S1",
+    "channels": {
+      "G": 2,
+      "VM": 1,
+      "RF": 0
+    },
+    "n": 75715,
+    "n_ds": 25239,
+    "fs": 330.0,
+    "n_events": 201
+  },
+  {
+    "name": "Ramp_60s_v2",
+    "session": "S2",
+    "channels": {
+      "G": 1,
+      "VM": 2,
+      "RF": 3
+    },
+    "n": 114737,
+    "n_ds": 38246,
+    "fs": 330.0,
+    "n_events": 299
+  },
+  {
+    "name": "Ramp_30s",
+    "session": "S2",
+    "channels": {
+      "G": 1,
+      "VM": 2,
+      "RF": 3
+    },
+    "n": 54341,
+    "n_ds": 18114,
+    "fs": 330.0,
+    "n_events": 153
+  }
+]

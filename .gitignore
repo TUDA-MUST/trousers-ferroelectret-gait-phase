@@ -1,37 +1,23 @@
 # Python
 __pycache__/
 *.py[cod]
-*$py.class
-*.so
-.Python
 *.egg-info/
-.eggs/
-build/
-dist/
-.installed.cfg
-*.egg
-
-# Virtual environments
 .venv/
 venv/
-env/
-ENV/
+build/
+dist/
 
-# Editor / IDE
+# Outputs and local data (the dataset is downloaded from TUdatalib, not versioned here)
+results/
+data/
+Ferroelectret_FMG_Dataset*/
+*.zip
+*.npz
+*.pkl
+
+# PlatformIO / editors
+.pio/
 .vscode/
 .idea/
-*.swp
-*.swo
-*~
 .DS_Store
-
-# Test / coverage
-.pytest_cache/
-.coverage
-htmlcov/
-.tox/
-
-# Demo output
-demo_output.png
-*.png
-!docs/**/*.png
+Thumbs.db

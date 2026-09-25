@@ -1,8 +1,6 @@
-numpy>=1.22
-scipy>=1.9
-matplotlib>=3.5
-
-# Required only for the tcn_hybrid package (loading the trained TCN and
-# running inference). Skip if you only need the single-sensor AO baseline
-# in the ao_gait_phase package.
+# Tested with Python 3.12.3, numpy 1.26.4, scipy 1.16.3, torch 2.5.1, pandas 2.2.2.
+# scipy's filter design and polyphase resampling determine the exact numbers; other
+# versions should agree to within rounding.
+numpy>=1.24
+scipy>=1.10
 torch>=2.0
