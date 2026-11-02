@@ -6,8 +6,8 @@
 >
 > 1. `include/tcn_weights_gen.h` and the expected outputs of the TCN self-test in
 >    `include/tcn_test_gen.h` come from an earlier checkpoint of the hybrid network that was
->    trained on all six ramp speeds, before the paper networks were retrained with the 4.5
->    and 5.5 km/h steps held out (`../weights/`). The architecture is the same, so the
+>    trained on all six ramp speeds, before the paper networks were retrained with two
+>    windows of each ramp held out (`../weights/`). The architecture is the same, so the
 >    timing and memory figures in [RESULTS.md](RESULTS.md) hold; its accuracy figures refer
 >    to the earlier checkpoint. To deploy the paper network, regenerate the header with
 >    `python tools/export_weights_c.py ../weights/tcn_hybrid_7L48f.pt include/tcn_weights_gen.h`.
@@ -19,9 +19,9 @@
 >    `tools/hil_validate.py` streams to the board, are not included, and neither are the
 >    scripts that produced them from the internal analysis code (`tools/export_params.py`,
 >    `tools/export_multi.py`, `tools/tcn_streaming_check.py`). The Python package of this
->    repository computes the same signals from the public dataset. The measured tables
+>    repository computes the same signals from the TUdatalib dataset. The measured tables
 >    `reference/hil_*.csv` are included.
-> 3. `include/excerpt_gen.h` contains the first 20 s of the S1 speed ramp from the public
+> 3. `include/excerpt_gen.h` contains the first 20 s of the S1 speed ramp from the TUdatalib
 >    dataset (CC BY 4.0) for the boot self-test. The weight exporter referred to below as
 >    `../export_weights_c.py` is `tools/export_weights_c.py` here.
 

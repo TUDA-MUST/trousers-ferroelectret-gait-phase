@@ -4,7 +4,7 @@ title: "trousers-ferroelectret-gait-phase: adaptive continuous gait phase estima
 repository-code: "https://github.com/TUDA-MUST/trousers-ferroelectret-gait-phase"
 type: software
 license: MIT
-version: 1.0.0
+version: 1.0.1
 authors:
   - family-names: Seiler
     given-names: Julian
@@ -31,6 +31,7 @@ preferred-citation:
   type: article
   title: "Adaptive Continuous Gait Phase Estimation from Textile-Integrated Ferroelectret Sensors"
   journal: "Bioinspiration & Biomimetics"
+  status: submitted
   year: 2026
   authors:
     - family-names: Seiler

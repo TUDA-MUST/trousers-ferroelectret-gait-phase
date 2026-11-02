@@ -1,4 +1,4 @@
-"""Load the public recordings (TUdatalib, DOI 10.48328/tudatalib-2246) at a common 330 Hz.
+"""Load the TUdatalib recordings (TUdatalib, DOI 10.48328/tudatalib-2246) at a common 330 Hz.
 
 The two sessions were sampled at about 333 Hz (S1) and 392 Hz (S2). Every recording is
 brought to a uniform 330 Hz grid with anti-aliased polyphase resampling right after

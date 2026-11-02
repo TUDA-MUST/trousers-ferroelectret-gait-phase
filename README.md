@@ -4,7 +4,7 @@ Code for the article
 
 > J. Seiler, M. Suppelt, R. Wilhelm, P. Beckerle, M. Kupnik,
 > "Adaptive Continuous Gait Phase Estimation from Textile-Integrated Ferroelectret Sensors,"
-> *Bioinspiration & Biomimetics*, 2026 (volume, article number and DOI to be added on publication).
+> under review at *Bioinspiration & Biomimetics* (volume, article number and DOI to be added on publication).
 
 Three ferroelectret force-myography sensors sewn into elastic jeans over the M. Gastrocnemius
 (G), M. Vastus Medialis (VM) and M. Rectus Femoris (RF) feed four estimators of continuous gait
@@ -17,7 +17,7 @@ phase:
 | **TCN** | stand-alone causal dilated TCN (7 layers, 48 filters, kernel 5, 167-sample window at 110 Hz) predicting the absolute phase | 2.8 |
 | **AO+TCN** | hybrid: the multi-head TCN predicts an additive correction to the C-AO phase, an absolute phase and a confidence, combined by a confidence-weighted circular blend | 2.8 |
 
-The repository reproduces the paper's results from the public recordings, bit for bit on the
+The repository reproduces the paper's results from the TUdatalib recordings, bit for bit on the
 oscillator side (see [Exactness](#exactness)).
 
 ## Contents
@@ -45,8 +45,12 @@ scripts/
 embedded/                 C port for ESP32 and Teensy 4.1 (PlatformIO), see embedded/README.md
 ```
 
-The networks in `weights/` are the paper models: trained on the two 60 s speed ramps with the
-4.5 and 5.5 km/h steps (and 5 s on either side) removed, which leaves 42,795 training windows.
+The networks in `weights/` are the paper models: trained on the two 60 s speed ramps with two
+70 s windows of each ramp removed, which leaves 42,795 training windows. The windows were meant
+to hold out the 4.5 and 5.5 km/h steps but lie on the nominal protocol grid, which starts at
+the trim; the trims cut 37.9 s and 11.2 s into the first speed step (`step_onset_s` in
+`params/recordings.json`), so the windows span parts of two adjacent steps and every speed
+also occurs in training. Their central 40 s are the held-out windows of the paper.
 
 ## Installation
 
@@ -65,7 +69,9 @@ Tested with Python 3.12.3, numpy 1.26.4, scipy 1.16.3 and torch 2.5.1.
 
 ## Data
 
-The recordings are published on TUdatalib under CC BY 4.0:
+The recordings are deposited on TUdatalib under CC BY 4.0 and become publicly accessible when
+the article is published. Until then, they are available from the corresponding author on
+reasonable request.
 
 > Wearable Ferroelectret Force Myography Dataset for Gait Phase Estimation,
 > DOI [10.48328/tudatalib-2246](https://doi.org/10.48328/tudatalib-2246)
@@ -103,30 +109,27 @@ Headline numbers
   continuous RMSE, recording mean (rad) AO+TCN        0.220     0.220      5  ok
   temporal MAE, pooled (% stride)    AO                2.19      2.19   1249  ok
   temporal MAE, pooled (% stride)    AO+TCN            1.50      1.50   1259  ok
-  held-out speeds, per-stride MAE (rad) AO            0.081     0.081    151  ok
-  held-out speeds, per-stride MAE (rad) AO+TCN        0.063     0.063    151  ok
-  held-out speeds, per-stride MAE (rad) TCN           0.049     0.049    151  ok
+  held-out windows, per-stride MAE (rad) AO            0.081     0.081    151  ok
+  held-out windows, per-stride MAE (rad) AO+TCN        0.063     0.063    151  ok
+  held-out windows, per-stride MAE (rad) TCN           0.049     0.049    151  ok
 
 Table 4: per-stride MAE by training exposure (rad)
   split                      n              AO          AO+TCN             TCN   (paper / release)
   training recordings      649   0.127 / 0.127   0.069 / 0.069   0.051 / 0.051
-    held-out speeds        151   0.081 / 0.081   0.063 / 0.063   0.049 / 0.049
+    held-out windows       151   0.081 / 0.081   0.063 / 0.063   0.049 / 0.049
   evaluation recordings    608   0.203 / 0.203   0.150 / 0.150   0.298 / 0.298
   S1, evaluation           448   0.216 / 0.216   0.151 / 0.151   0.353 / 0.353
   S2, evaluation           160   0.165 / 0.165   0.147 / 0.147   0.144 / 0.144
 ```
 
 The script also prints the single-sensor results of Table 2 by session and the pooled temporal
-errors of all four configurations. Of the 40 compared values, 39 agree at the printed
-precision. The exception is the standard deviation of the S2 direct MAE in Table 2: it is
-0.00344 rad, which prints as 0.003, whereas the paper gives 0.004, consistent with rounding a
-four-decimal intermediate value of 0.0035. The script exits with status 0 when every compared value agrees with the
-paper or differs for a reason printed next to it.
+errors of all four configurations. All 40 compared values agree at the printed precision, and
+the script exits with status 0 when they do.
 
 ### Exactness
 
 The release was checked against the analysis code used for the paper, recording by recording
-and array by array. From the public files, the bandpass signals, the FSR reference, the AO and
+and array by array. From the dataset files, the bandpass signals, the FSR reference, the AO and
 C-AO phases and events, and the network input windows are bit-identical; so are all 5,028
 per-stride errors and 5,019 matched heel-strike offsets with the networks on CUDA. On the CPU
 the network outputs differ from the CUDA values by less than 2e-5 rad per sample (float32
@@ -144,7 +147,7 @@ Two details of the evaluation are reproduced on purpose:
   exactly; `--keep-first-sample` runs on the complete files, which shifts the resampling grid
   by one native sample. The pooled per-stride and continuous values stay the same at three
   decimals; other values that include S2 strides move by up to 0.005 rad (S2 stride-time MAE
-  0.172 instead of 0.167 rad, held-out speeds AO 0.082 and AO+TCN 0.064 instead of 0.081 and
+  0.172 instead of 0.167 rad, held-out windows AO 0.082 and AO+TCN 0.064 instead of 0.081 and
   0.063 rad) and the AO temporal MAE by 0.01 percentage points.
 
 Not included: the breakdown of the temporal error into steady walking, speed transitions and
@@ -184,7 +187,8 @@ Implementation conventions worth knowing when comparing with the equations of th
 - The frequency consensus of the C-AO applies ω_j ← ω_j + κ(ω̄ − ω_j)Δt to each channel, with
   ω̄ = Σ q_j ω_j / Σ q_j and q_j = Σ_n |α_n,j|.
 - The event-detector parameters were optimized on the complete S1 speed ramp, including its
-  held-out-speed steps; the oscillator parameters only on its first 60 s (4.0 km/h).
+  held-out windows; the oscillator parameters only on its first 60 s (22 s at 4.0 and 38 s at
+  4.5 km/h).
 
 ## Retraining the networks
 
@@ -198,15 +202,15 @@ OneCycleLR with peak 3e-3, 300 epochs, batch 1024, amplitude scaling 0.05 to 5, 
 dropout, noise 0.01) and keeps the epoch with the lowest training loss. Seed 0 matches the paper
 models' seeds, but GPU training is not bit-reproducible across hardware and library versions:
 three training seeds of the hybrid gave pooled per-stride MAEs of 0.100 to 0.108 rad. One
-network took about two hours on a workstation GPU. `--no-holdout` trains on all six ramp
-speeds.
+network took about two hours on a workstation GPU. `--no-holdout` trains on the complete
+ramps.
 
 ## Embedded implementation
 
 `embedded/` holds the plain-C99 port of the estimators (bandpass, AO, event detector, phase
 correction, C-AO and exact windowed TCN inference) with a PlatformIO harness for the ESP32 and
 the Teensy 4.1, validated in the loop against the Python pipeline. Measured costs are in
-`embedded/RESULTS.md`. The TCN weight header in that folder predates the held-out-speed
+`embedded/RESULTS.md`. The TCN weight header in that folder predates the held-out-window
 retraining of the paper networks; `embedded/README.md` explains how to regenerate it from
 `weights/tcn_hybrid_7L48f.pt`.
 
@@ -219,7 +223,8 @@ retraining of the paper networks; `embedded/README.md` explains how to regenerat
   journal = {Bioinspiration \& Biomimetics},
   year    = {2026},
   volume  = {TBD},
-  doi     = {TBD}
+  doi     = {TBD},
+  note    = {Under review}
 }
 ```
 
@@ -237,5 +242,10 @@ Training Group 2761.
 
 ## Version history
 
+- 1.0.1 (November 2026): measured speed-step onsets of the three ramps (`step_onset_s` in
+  `params/recordings.json`) for the steady and transition segments, and the held-out windows
+  defined as the central parts of the windows removed from network training. The networks,
+  parameters and every reproduced value are unchanged. The Table 2 reference in
+  `scripts/reproduce.py` now matches the article, so all 40 compared values agree.
 - 1.0.0 (2026): release accompanying the revised article. It replaces the initial release
   (packages `ao_gait_phase` and `tcn_hybrid`, May 2026), which remains in the git history.

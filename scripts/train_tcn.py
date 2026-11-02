@@ -1,8 +1,10 @@
-"""Retrain a paper network from the public recordings (paper Section 2.8, Table 1).
+"""Retrain a paper network from the TUdatalib recordings (paper Section 2.8, Table 1).
 
-Training data: the two 60 s speed ramps (S1 and S2). The 4.5 and 5.5 km/h steps, with
-5 s on either side, are removed from the training set (not only zero-weighted), which
-leaves 42,795 windows at 110 Hz. The hybrid network learns the absolute phase, the
+Training data: the two 60 s speed ramps (S1 and S2). Two 70 s windows of each ramp (55 to
+125 s and 175 to 245 s after the trim, on the nominal protocol grid) are removed from the
+training set (not only zero-weighted), which leaves 42,795 windows at 110 Hz. On the measured
+speed steps each window spans parts of two adjacent steps, so every speed also occurs in
+training. The hybrid network learns the absolute phase, the
 residual of the C-AO phase and a confidence; the stand-alone network only the absolute
 phase.
 
@@ -31,7 +33,12 @@ TWO_PI = 2 * np.pi
 
 
 def holdout_mask(time_ds, meta, holdout_speeds, guard_s):
-    """True for 110 Hz samples outside every guarded held-out speed step."""
+    """True for 110 Hz samples outside the two windows per ramp removed from training.
+
+    The windows lie on the nominal protocol grid (step i at i * speed_duration_s after the
+    trim), as for the paper networks. Because the trims cut into the first speed step
+    (step_onset_s in params/recordings.json), they do not coincide with the 4.5 and
+    5.5 km/h steps, and every speed also occurs in training."""
     keep = np.ones(len(time_ds), dtype=bool)
     if meta['protocol'] != 'ramp':
         return keep
@@ -134,7 +141,7 @@ def main():
     ap.add_argument('--out', required=True, help='output state_dict (.pt)')
     ap.add_argument('--seed', type=int, default=0)
     ap.add_argument('--epochs', type=int, default=300)
-    ap.add_argument('--no-holdout', action='store_true', help='train on all six ramp speeds')
+    ap.add_argument('--no-holdout', action='store_true', help='train on the complete ramps')
     ap.add_argument('--device', default='auto')
     args = ap.parse_args()
 

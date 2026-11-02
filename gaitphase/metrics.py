@@ -156,6 +156,10 @@ def event_consistency(event_times, time, phase_gt):
 def protocol_segments(meta, convergence_s=10.0, transition_s=10.0, steady_margin_s=10.0):
     """Analysis segments from the protocol timing (times after trimming).
 
+    Speed step i of a ramp starts at step_onset_s + i * speed_duration_s, where step_onset_s
+    is the measured start of the first step in the trimmed time base (params/recordings.json).
+    Steady segments skip steady_margin_s at both ends of a step and start after the
+    convergence window; the last step runs to the end of the recording.
     Returns a list of dicts with 'condition' ('convergence', 'steady', 'transition'),
     'start_s', 'end_s' and 'speed' (km/h as a string; 'a->b' for transitions).
     """
@@ -163,11 +167,14 @@ def protocol_segments(meta, convergence_s=10.0, transition_s=10.0, steady_margin
     segs = [{'condition': 'convergence', 'start_s': 0.0, 'end_s': convergence_s, 'speed': str(speeds[0])}]
     if meta['protocol'] == 'ramp':
         dur = meta['speed_duration_s']
+        onset = meta.get('step_onset_s', 0.0)
         for i, v in enumerate(speeds):
-            a, b = i * dur, (i + 1) * dur
-            if (b - steady_margin_s) > (a + steady_margin_s) + 5.0:
-                segs.append({'condition': 'steady', 'start_s': a + steady_margin_s,
-                             'end_s': b - steady_margin_s, 'speed': str(v)})
+            a, b = onset + i * dur, onset + (i + 1) * dur
+            start = max(a + steady_margin_s, convergence_s)
+            end = float('inf') if i == len(speeds) - 1 else b - steady_margin_s
+            min_len = 0.0 if (i == 0 and onset < 0) else 5.0
+            if end > start + min_len:
+                segs.append({'condition': 'steady', 'start_s': start, 'end_s': end, 'speed': str(v)})
             if i < len(speeds) - 1:
                 segs.append({'condition': 'transition', 'start_s': max(b - transition_s, 0),
                              'end_s': b + transition_s, 'speed': f'{v}->{speeds[i + 1]}'})

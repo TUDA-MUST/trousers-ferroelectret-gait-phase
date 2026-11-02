@@ -19,7 +19,7 @@ from .data import load_recording, load_registry, find_dataset_root, MUSCLES, FS
 from .preprocessing import causal_bandpass, bandpass_from_params, to_volts, fsr_reference
 from .estimator import run_estimator
 
-__version__ = '1.0.0'
+__version__ = '1.0.1'
 
 DEFAULT_PARAMS = Path(__file__).resolve().parents[1] / 'params' / 'estimator_params.json'
 

@@ -1,5 +1,5 @@
 {
-  "description": "Paper networks (held-out-speed models): trained on the two 60 s speed ramps (S1 and S2) with the 4.5 and 5.5 km/h steps, plus 5 s on either side, removed from the training set (42,795 samples at 110 Hz). Seed 0. PyTorch state_dicts, load with torch.load(..., weights_only=True).",
+  "description": "Paper networks: trained on the two 60 s speed ramps (S1 and S2) with two 70 s windows of each ramp removed from the training set (42,795 samples at 110 Hz); their central 40 s are the held-out windows of the paper. Seed 0. PyTorch state_dicts, load with torch.load(..., weights_only=True).",
   "architecture": {
     "type": "causal dilated TCN (Bai et al. 2018): GroupNorm(1, 3) input, 7 causal conv layers with BatchNorm, ReLU, dropout, identity skip in layers 2-7, linear heads on the last time step",
     "n_inputs": 3,

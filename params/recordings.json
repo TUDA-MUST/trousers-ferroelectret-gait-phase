@@ -1,5 +1,5 @@
 {
-  "description": "The five recordings evaluated in the paper, as published on TUdatalib (DOI 10.48328/tudatalib-2246). Paths are relative to the dataset root (the folder that contains data/). Channels map the three muscle sites to the CSV columns; the wiring differs between sessions. Trims are applied after resampling to 330 Hz.",
+  "description": "The five recordings evaluated in the paper, as published on TUdatalib (DOI 10.48328/tudatalib-2246). Paths are relative to the dataset root (the folder that contains data/). Channels map the three muscle sites to the CSV columns; the wiring differs between sessions. Trims are applied after resampling to 330 Hz. step_onset_s is the measured start of the first speed step (4.0 km/h) in the trimmed time base: each raw ramp holds exactly six speed steps between a standstill before and after, and the program starts with the walking onset, so the trims cut into the first step. The holdout keys define the two windows per training ramp that were removed from network training; they lie on the nominal protocol grid (step i at i * speed_duration_s after the trim) and therefore do not coincide with the measured speed steps.",
   "holdout_speeds_kmh": [4.5, 5.5],
   "holdout_guard_s": 5.0,
   "recordings": {
@@ -14,6 +14,7 @@
       "protocol": "ramp",
       "speeds_kmh": [4.0, 4.5, 5.0, 5.5, 6.0, 6.5],
       "speed_duration_s": 60.0,
+      "step_onset_s": -37.9,
       "tcn_training": true,
       "drop_first_sample": false
     },
@@ -56,6 +57,7 @@
       "protocol": "ramp",
       "speeds_kmh": [4.0, 4.5, 5.0, 5.5, 6.0, 6.5],
       "speed_duration_s": 60.0,
+      "step_onset_s": -11.2,
       "tcn_training": true,
       "drop_first_sample": true
     },
@@ -70,6 +72,7 @@
       "protocol": "ramp",
       "speeds_kmh": [4.0, 4.5, 5.0, 5.5, 6.0, 6.5],
       "speed_duration_s": 30.0,
+      "step_onset_s": -16.0,
       "tcn_training": false,
       "drop_first_sample": true
     }

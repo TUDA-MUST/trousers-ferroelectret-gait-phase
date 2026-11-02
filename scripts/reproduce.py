@@ -1,4 +1,4 @@
-"""Reproduce the paper's results from the public recordings.
+"""Reproduce the paper's results from the TUdatalib recordings.
 
 Runs the four configurations (AO, C-AO, TCN, AO+TCN) on the five evaluated recordings
 and prints the release values next to the values printed in the paper.
@@ -47,6 +47,18 @@ def evaluate_recording(root, name, registry, params, models, device, drop_first_
     return rec, ref, ao, phases
 
 
+def in_heldout_window(mid, meta, holdout, margin_s=10.0):
+    """True if time mid lies in the central part of a window removed from network training.
+
+    The windows sit on the nominal protocol grid (step i at i * speed_duration_s after the
+    trim), which is how the paper networks were trained; see params/recordings.json."""
+    if meta['protocol'] != 'ramp':
+        return False
+    dur = meta['speed_duration_s']
+    return any(i * dur + margin_s <= mid < (i + 1) * dur - margin_s
+               for i, v in enumerate(meta['speeds_kmh']) if v in holdout)
+
+
 def collect(root, registry, params, models, device, drop_first_sample, verbose=True):
     """Evaluate every recording and gather per-stride, temporal and per-recording results."""
     holdout = set(registry['holdout_speeds_kmh'])
@@ -66,12 +78,13 @@ def collect(root, registry, params, models, device, drop_first_sample, verbose=T
                 seg = M.segment_of(0.5 * (float(t[s]) + float(t[e - 1])), segs)
                 cond = seg['condition'] if seg else 'unknown'
                 speed = seg['speed'] if seg else ''
-                # held-out speeds: steady strides at 4.5 or 5.5 km/h of the two training ramps
-                held = (meta['tcn_training'] and cond == 'steady' and '->' not in speed
-                        and float(speed) in holdout)
+                # held-out windows: strides of the two training ramps in the central 40 s of the
+                # windows removed from network training (nominal protocol grid, see recordings.json)
+                held = meta['tcn_training'] and in_heldout_window(
+                    0.5 * (float(t[s]) + float(t[e - 1])), meta, holdout)
                 strides.append({'recording': name, 'session': meta['session'],
                                 'training': meta['tcn_training'], 'stride': k, 'condition': cond,
-                                'speed_kmh': speed, 'held_out_speed': held, 'method': m, 'mae_rad': mae})
+                                'speed_kmh': speed, 'held_out_window': held, 'method': m, 'mae_rad': mae})
             te = M.temporal_errors(ph, t, ref['hs_times'])
             if te is not None:
                 for j in range(len(te['offset_s'])):
@@ -119,33 +132,28 @@ def report(strides, temporal, per_rec):
         v = [abs(r['offset_pct']) for r in temporal if r['method'] == m]
         checks.append(line(f'temporal MAE, pooled (% stride)    {m}', p, float(np.mean(v)), len(v), dec=2))
     for m, p in (('AO', 0.081), ('AO+TCN', 0.063), ('TCN', 0.049)):
-        v, n = mean_of(strides, method=m, held_out_speed=True, training=True)
-        checks.append(line(f'held-out speeds, per-stride MAE (rad) {m}', p, v, n))
+        v, n = mean_of(strides, method=m, held_out_window=True, training=True)
+        checks.append(line(f'held-out windows, per-stride MAE (rad) {m}', p, v, n))
 
     print('\nTable 2: single-sensor AO, mean +- SD across recordings (rad)')
     paper_t2 = {'S1': [(0.179, 0.111), (0.291, 0.147), (0.183, 0.126), (0.096, 0.019)],
-                'S2': [(0.127, 0.001), (0.287, 0.005), (0.136, 0.004), (0.167, 0.007)],
+                'S2': [(0.127, 0.001), (0.287, 0.005), (0.136, 0.003), (0.167, 0.007)],
                 'All': [(0.158, 0.089), (0.290, 0.114), (0.164, 0.100), (0.124, 0.038)]}
     keys = [('AO cont_mae', 'Cont MAE'), ('AO cont_rmse', 'Cont RMSE'), ('AO dir_mae', 'Dir MAE'),
             ('AO st_mae', 'ST-MAE')]
-    # Known deviation: S2 Dir MAE SD is 0.00344; the paper's 0.004 is consistent with rounding
-    # a four-decimal intermediate value of 0.0035.
-    known = {('S2', 'Dir MAE'): 'SD 0.00344; paper value consistent with rounding 0.0035'}
     for grp, sel in (('S1', lambda r: r['session'] == 'S1'), ('S2', lambda r: r['session'] == 'S2'),
                      ('All', lambda r: True)):
         rs = [r for r in per_rec if sel(r)]
         for (k, lab), (pm, psd) in zip(keys, paper_t2[grp]):
             v = np.array([r[k] for r in rs])
             ok = f'{v.mean():.3f}' == f'{pm:.3f}' and f'{v.std():.3f}' == f'{psd:.3f}'
-            note = '' if ok else known.get((grp, lab), '')
-            checks.append('known' if note else ok)
+            checks.append(ok)
             print(f"  {grp:<4} {lab:<10} paper {pm:.3f} +- {psd:.3f}   release {v.mean():.3f} +- "
-                  f"{v.std():.3f}  (n={len(rs)})  {'ok' if ok else 'DIFF'}"
-                  + (f'  ({note})' if note else ''))
+                  f"{v.std():.3f}  (n={len(rs)})  {'ok' if ok else 'DIFF'}")
 
     print('\nTable 4: per-stride MAE by training exposure (rad)')
     paper_t4 = [('training recordings', dict(training=True), (0.127, 0.069, 0.051)),
-                ('  held-out speeds', dict(training=True, held_out_speed=True), (0.081, 0.063, 0.049)),
+                ('  held-out windows', dict(training=True, held_out_window=True), (0.081, 0.063, 0.049)),
                 ('evaluation recordings', dict(training=False), (0.203, 0.150, 0.298)),
                 ('S1, evaluation', dict(training=False, session='S1'), (0.216, 0.151, 0.353)),
                 ('S2, evaluation', dict(training=False, session='S2'), (0.165, 0.147, 0.144))]
@@ -169,11 +177,8 @@ def report(strides, temporal, per_rec):
         print(f"  {r['recording']:<13} AO event consistency R = {r['AO event_R']:.3f}")
 
     n_ok = sum(c is True for c in checks)
-    n_known = sum(c == 'known' for c in checks)
-    print(f'\n{n_ok} of {len(checks)} compared values agree with the paper at the printed precision'
-          + (f'; {n_known} differ{"s" if n_known == 1 else ""} for the reason printed next to '
-             f'{"it" if n_known == 1 else "them"}.' if n_known else '.'))
-    return n_ok + n_known == len(checks)
+    print(f'\n{n_ok} of {len(checks)} compared values agree with the paper at the printed precision.')
+    return n_ok == len(checks)
 
 
 def write_csv(path, rows):

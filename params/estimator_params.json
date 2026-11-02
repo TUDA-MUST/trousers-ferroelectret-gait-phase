@@ -1,5 +1,5 @@
 {
-  "description": "Optimized estimator parameters (paper Table 1) at full precision. The adaptive-oscillator rates and the correction gain come from 200 TPE trials on the first 60 s of the S1 speed ramp (4.0 km/h); the phase offset is the closed-form value of that optimization. The event-detector parameters come from a separate run of 150 trials on the complete S1 speed ramp.",
+  "description": "Optimized estimator parameters (paper Table 1) at full precision. The adaptive-oscillator rates and the correction gain come from 200 TPE trials on the first 60 s of the trimmed S1 speed ramp (22 s at 4.0 and 38 s at 4.5 km/h); the phase offset is the closed-form value of that optimization. The event-detector parameters come from a separate run of 150 trials on the complete S1 speed ramp.",
   "sampling_rate_hz": 330.0,
   "bandpass": {
     "highpass_hz": 0.5,
