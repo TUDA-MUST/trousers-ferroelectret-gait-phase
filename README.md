@@ -11,13 +11,13 @@ the parameters, network weights and scripts that reproduce the article's results
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/media/ferro_to_phase_dark.gif">
-  <img src="docs/media/ferro_to_phase_light.gif" width="100%" alt="Animation of the estimator running on recorded data: three raw sensor signals, the oscillator fit to the bandpass M. Gastrocnemius signal with detected gait events, and the estimated gait phase converging onto the FSR reference, next to a rotating phase dial.">
+  <img src="docs/media/ferro_to_phase_light.gif" width="100%" alt="Animation of the estimator running on recorded data: the instrumented trousers with the three sensor sites, three raw sensor signals, the oscillator fit to the bandpass M. Gastrocnemius signal with detected gait events, and the estimated gait phase converging onto the FSR reference, next to a rotating phase dial.">
 </picture>
 
 *The single-sensor AO starting cold on the first 12 s of an evaluation recording at 4.0 km/h,
 replayed at real-time speed. The bandpass M. Gastrocnemius signal drives the oscillator, which
-learns its waveform within a few strides (2). Each detected negative peak updates the phase
-error learner, which shifts the oscillator phase onto the heel-strike reference, and the
+learns its waveform within a few strides (2). Each detected negative peak, marked by the
+flashing sensor on the trousers, updates the phase error learner, which shifts the oscillator phase onto the heel-strike reference, and the
 estimate locks onto the FSR reference within four to five strides (3). Rendered from the
 dataset by [`scripts/make_animation.py`](scripts/make_animation.py).*
 
@@ -47,6 +47,17 @@ phase:
 | **C-AO** | (a) + (b) | one oscillator per channel, frequencies pulled toward their quality-weighted mean (Kuramoto-type consensus, κ = 0.25); events and correction on G only | 2.7 |
 | **TCN** | (c) | stand-alone causal dilated TCN (7 layers, 48 filters, kernel 5, 167-sample window at 110 Hz) predicting the absolute phase | 2.8 |
 | **AO+TCN** | (a) + (b) + (c) | hybrid: the multi-head TCN predicts an additive correction to the C-AO phase, an absolute phase and a confidence, combined by a confidence-weighted circular blend | 2.8 |
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/media/hybrid_dark.gif">
+  <img src="docs/media/hybrid_light.gif" width="100%" alt="Animation of the hybrid estimator on recorded data: the three bandpass signals with the network's sliding 1.52 s input window, the correction the network adds to the oscillator phase, and the phase error of the coupled oscillators and of AO+TCN against the FSR reference, next to a phase dial.">
+</picture>
+
+*The hybrid AO+TCN on 12 s of walking at 6.0 km/h, 114 s into the same evaluation recording,
+which the network never saw in training. In this window the coupled oscillators lag the FSR
+reference by about 0.11 rad. From the last 1.52 s of the three bandpass signals (1), the network
+adds about 0.08 rad to the oscillator phase (2) and halves the phase error (3). The window shows
+the correction at its clearest. The averages over all recordings follow in [Results](#results).*
 
 ## Results
 
@@ -94,9 +105,9 @@ weights/
 scripts/
   reproduce.py            runs the four configurations and prints paper vs release values
   train_tcn.py            retrains a network with the paper settings
-  make_animation.py       renders the animation at the top of this page (needs matplotlib and Pillow)
+  make_animation.py       renders the two animations on this page (needs matplotlib and Pillow)
 embedded/                 C port for ESP32 and Teensy 4.1 (PlatformIO), see embedded/README.md
-docs/media/               README animation and figures adapted from the article
+docs/media/               README animations, trousers photo and figures adapted from the article
 ```
 
 The networks in `weights/` are the paper models: trained on the two 60 s speed ramps with two
