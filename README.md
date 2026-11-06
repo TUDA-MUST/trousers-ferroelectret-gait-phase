@@ -1,21 +1,73 @@
 # trousers-ferroelectret-gait-phase
 
+[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776ab)](#installation)
+[![License: MIT](https://img.shields.io/badge/license-MIT-2ea44f)](LICENSE)
+[![Bioinspiration & Biomimetics: under review](https://img.shields.io/badge/Bioinspir.%20Biomim.-under%20review-8250df)](#citation)
+[![Embedded: ESP32 and Teensy 4.1](https://img.shields.io/badge/embedded-ESP32%20%7C%20Teensy%204.1-e05d44)](embedded/README.md)
+
+Continuous gait phase from textile-integrated ferroelectret sensors: an adaptive oscillator,
+a coupled-oscillator variant, a causal temporal convolutional network and their hybrid, with
+the parameters, network weights and scripts that reproduce the article's results.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/media/ferro_to_phase_dark.gif">
+  <img src="docs/media/ferro_to_phase_light.gif" width="100%" alt="Animation of the estimator running on recorded data: three raw sensor signals, the oscillator fit to the bandpass M. Gastrocnemius signal with detected gait events, and the estimated gait phase converging onto the FSR reference, next to a rotating phase dial.">
+</picture>
+
+*The single-sensor AO starting cold on the first 12 s of an evaluation recording at 4.0 km/h,
+replayed at real-time speed. The bandpass M. Gastrocnemius signal drives the oscillator, which
+learns its waveform within a few strides (2). Each detected negative peak updates the phase
+error learner, which shifts the oscillator phase onto the heel-strike reference, and the
+estimate locks onto the FSR reference within four to five strides (3). Rendered from the
+dataset by [`scripts/make_animation.py`](scripts/make_animation.py).*
+
 Code for the article
 
 > J. Seiler, M. Suppelt, R. Wilhelm, P. Beckerle, M. Kupnik,
 > "Adaptive Continuous Gait Phase Estimation from Textile-Integrated Ferroelectret Sensors,"
 > under review at *Bioinspiration & Biomimetics* (volume, article number and DOI to be added on publication).
 
+## How it works
+
+![Sensor placement and layer structure of the ferroelectret sensors in the trousers, and average sensor signals over the gait cycle](docs/media/sensors.png)
+
+*Sensor placement and layer structure (left) and the average bandpass signal of each channel
+over the gait cycle at six treadmill speeds (right). The negative peak of the M. Gastrocnemius
+signal is the gait event that anchors the phase. Adapted from the article.*
+
 Three ferroelectret force-myography sensors sewn into elastic jeans over the M. Gastrocnemius
 (G), M. Vastus Medialis (VM) and M. Rectus Femoris (RF) feed four estimators of continuous gait
 phase:
 
-| configuration | what it does | paper section |
-| --- | --- | --- |
-| **AO** | single adaptive oscillator on the G channel, adaptive-threshold event detector, event-driven phase error learning (after Yan et al. 2017) | 2.3 to 2.5 |
-| **C-AO** | one oscillator per channel, frequencies pulled toward their quality-weighted mean (Kuramoto-type consensus, κ = 0.25); events and correction on G only | 2.7 |
-| **TCN** | stand-alone causal dilated TCN (7 layers, 48 filters, kernel 5, 167-sample window at 110 Hz) predicting the absolute phase | 2.8 |
-| **AO+TCN** | hybrid: the multi-head TCN predicts an additive correction to the C-AO phase, an absolute phase and a confidence, combined by a confidence-weighted circular blend | 2.8 |
+![Block diagram of the estimation framework: bandpass filter, adaptive oscillators with gait event detection and phase error learning, Kuramoto coupling, and the TCN with confidence-based correction](docs/media/framework.png)
+
+| configuration | modules in the diagram | what it does | paper section |
+| --- | --- | --- | --- |
+| **AO** | (a) | single adaptive oscillator on the G channel, adaptive-threshold event detector, event-driven phase error learning (after Yan et al. 2017) | 2.3 to 2.5 |
+| **C-AO** | (a) + (b) | one oscillator per channel, frequencies pulled toward their quality-weighted mean (Kuramoto-type consensus, κ = 0.25); events and correction on G only | 2.7 |
+| **TCN** | (c) | stand-alone causal dilated TCN (7 layers, 48 filters, kernel 5, 167-sample window at 110 Hz) predicting the absolute phase | 2.8 |
+| **AO+TCN** | (a) + (b) + (c) | hybrid: the multi-head TCN predicts an additive correction to the C-AO phase, an absolute phase and a confidence, combined by a confidence-weighted circular blend | 2.8 |
+
+## Results
+
+![Histograms and box plots of the per-stride phase error of the four configurations](docs/media/results.png)
+
+*Per-stride mean absolute phase error of the four configurations, (a) pooled over all strides
+of the five recordings and (b) by segment group without the first 10 s of each recording.
+The evaluation recordings are the three recordings excluded from weight optimization. Adapted
+from the article.*
+
+On five treadmill recordings (4.0 to 6.7 km/h) of one participant in two sessions:
+
+- The single-sensor AO reaches a continuous MAE of 0.158 rad, about 2.5 % of the stride, and
+  transfers to the second session without re-tuning.
+- The hybrid AO+TCN lowers the per-stride MAE from 0.163 to 0.108 rad and the temporal error at
+  heel strike from 2.19 % to 1.50 % of the stride duration.
+- The stand-alone TCN reaches the lowest error on the training recordings but degrades on the
+  other three recordings, whereas the oscillator keeps the hybrid's error low.
+- On a Teensy 4.1, the single-sensor AO takes 10 µs per 330 Hz sample, and the complete hybrid
+  runs at the evaluated 110 Hz network rate on 74 % of one core
+  ([`embedded/RESULTS.md`](embedded/RESULTS.md)).
 
 The repository reproduces the paper's results from the TUdatalib recordings, bit for bit on the
 oscillator side (see [Exactness](#exactness)).
@@ -42,7 +94,9 @@ weights/
 scripts/
   reproduce.py            runs the four configurations and prints paper vs release values
   train_tcn.py            retrains a network with the paper settings
+  make_animation.py       renders the animation at the top of this page (needs matplotlib and Pillow)
 embedded/                 C port for ESP32 and Teensy 4.1 (PlatformIO), see embedded/README.md
+docs/media/               README animation and figures adapted from the article
 ```
 
 The networks in `weights/` are the paper models: trained on the two 60 s speed ramps with two
