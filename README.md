@@ -15,11 +15,9 @@ the parameters, network weights and scripts that reproduce the article's results
 </picture>
 
 *The single-sensor AO starting cold on the first 12 s of an evaluation recording at 4.0 km/h,
-replayed at real-time speed. The bandpass M. Gastrocnemius signal drives the oscillator, which
-learns its waveform within a few strides (2). Each detected negative peak, marked by the
-flashing sensor on the trousers, updates the phase error learner, which shifts the oscillator phase onto the heel-strike reference, and the
-estimate locks onto the FSR reference within four to five strides (3). Rendered from the
-dataset by [`scripts/make_animation.py`](scripts/make_animation.py).*
+in real time. The oscillator learns the M. Gastrocnemius waveform within a few strides (2).
+Each detected negative peak, marked by the flashing sensor, corrects the phase, and the
+estimate locks onto the FSR reference within four to five strides (3).*
 
 Code for the article
 
@@ -28,12 +26,6 @@ Code for the article
 > under review at *Bioinspiration & Biomimetics* (volume, article number and DOI to be added on publication).
 
 ## How it works
-
-![Sensor placement and layer structure of the ferroelectret sensors in the trousers, and average sensor signals over the gait cycle](docs/media/sensors.png)
-
-*Sensor placement and layer structure (left) and the average bandpass signal of each channel
-over the gait cycle at six treadmill speeds (right). The negative peak of the M. Gastrocnemius
-signal is the gait event that anchors the phase. Adapted from the article.*
 
 Three ferroelectret force-myography sensors sewn into elastic jeans over the M. Gastrocnemius
 (G), M. Vastus Medialis (VM) and M. Rectus Femoris (RF) feed four estimators of continuous gait
@@ -53,69 +45,25 @@ phase:
   <img src="docs/media/hybrid_light.gif" width="100%" alt="Animation of the hybrid estimator on recorded data: the three bandpass signals with the network's sliding 1.52 s input window, the correction the network adds to the oscillator phase, and the phase error of the coupled oscillators and of AO+TCN against the FSR reference, next to a phase dial.">
 </picture>
 
-*The hybrid AO+TCN on 12 s of walking at 6.0 km/h, 114 s into the same evaluation recording,
-which the network never saw in training. In this window the coupled oscillators lag the FSR
-reference by about 0.11 rad. From the last 1.52 s of the three bandpass signals (1), the network
-adds about 0.08 rad to the oscillator phase (2) and halves the phase error (3). The window shows
-the correction at its clearest. The averages over all recordings follow in [Results](#results).*
+*The hybrid AO+TCN on 12 s at 6.0 km/h, later in the same recording, which the network never
+saw in training. Here the coupled oscillators lag the FSR reference by about 0.11 rad. From the
+last 1.52 s of the three signals (1), the network adds about 0.08 rad to the oscillator phase
+(2) and halves the phase error (3). This window shows the correction at its clearest. The
+averages follow below.*
 
 ## Results
 
-![Histograms and box plots of the per-stride phase error of the four configurations](docs/media/results.png)
-
-*Per-stride mean absolute phase error of the four configurations, (a) pooled over all strides
-of the five recordings and (b) by segment group without the first 10 s of each recording.
-The evaluation recordings are the three recordings excluded from weight optimization. Adapted
-from the article.*
-
 On five treadmill recordings (4.0 to 6.7 km/h) of one participant in two sessions:
 
-- The single-sensor AO reaches a continuous MAE of 0.158 rad, about 2.5 % of the stride, and
-  transfers to the second session without re-tuning.
-- The hybrid AO+TCN lowers the per-stride MAE from 0.163 to 0.108 rad and the temporal error at
-  heel strike from 2.19 % to 1.50 % of the stride duration.
-- The stand-alone TCN reaches the lowest error on the training recordings but degrades on the
-  other three recordings, whereas the oscillator keeps the hybrid's error low.
-- On a Teensy 4.1, the single-sensor AO takes 10 µs per 330 Hz sample, and the complete hybrid
-  runs at the evaluated 110 Hz network rate on 74 % of one core
-  ([`embedded/RESULTS.md`](embedded/RESULTS.md)).
+- **AO:** continuous MAE of 0.158 rad, about 2.5 % of the stride, and no re-tuning between
+  sessions.
+- **AO+TCN:** per-stride MAE of 0.108 rad instead of 0.163 rad for the AO, and a heel-strike
+  timing error of 1.50 % instead of 2.19 % of the stride duration.
+- **TCN:** lowest error on its training recordings, but it degrades on the other three.
+- **Teensy 4.1:** the AO takes 10 µs per 330 Hz sample, and the complete hybrid runs at 110 Hz
+  on 74 % of one core ([`embedded/RESULTS.md`](embedded/RESULTS.md)).
 
-The repository reproduces the paper's results from the TUdatalib recordings, bit for bit on the
-oscillator side (see [Exactness](#exactness)).
-
-## Contents
-
-```text
-gaitphase/            Python package
-  data.py             load the TUdatalib CSVs, resample to 330 Hz, trim to the analysis window
-  preprocessing.py    causal bandpass (0.5-15 Hz), FSR heel-strike reference
-  oscillator.py       adaptive oscillator (RK4)
-  events.py           adaptive-threshold event detector
-  correction.py       phase error learner
-  estimator.py        AO and C-AO, sample by sample
-  tcn.py              network definitions, windowed inference, AO+TCN blend
-  metrics.py          continuous MAE/RMSE, direct MAE, ST-MAE, per-stride MAE, temporal error
-params/
-  estimator_params.json   optimized parameters of Table 1 at full precision
-  recordings.json         the five evaluated recordings: files, channel mapping, FSR thresholds, trims
-weights/
-  tcn_hybrid_7L48f.pt     AO+TCN network (state_dict, 71,099 parameters)
-  tcn_standalone_7L48f.pt TCN network (state_dict, 70,952 parameters)
-  tcn_config.json         architecture, training settings, checksums
-scripts/
-  reproduce.py            runs the four configurations and prints paper vs release values
-  train_tcn.py            retrains a network with the paper settings
-  make_animation.py       renders the two animations on this page (needs matplotlib and Pillow)
-embedded/                 C port for ESP32 and Teensy 4.1 (PlatformIO), see embedded/README.md
-docs/media/               README animations, trousers photo and figures adapted from the article
-```
-
-The networks in `weights/` are the paper models: trained on the two 60 s speed ramps with two
-70 s windows of each ramp removed, which leaves 42,795 training windows. The windows were meant
-to hold out the 4.5 and 5.5 km/h steps but lie on the nominal protocol grid, which starts at
-the trim; the trims cut 37.9 s and 11.2 s into the first speed step (`step_onset_s` in
-`params/recordings.json`), so the windows span parts of two adjacent steps and every speed
-also occurs in training. Their central 40 s are the held-out windows of the paper.
+Figures, statistics and the limits of a single participant are discussed in the article.
 
 ## Installation
 
@@ -158,8 +106,11 @@ The oscillators run sample by sample in plain Python, as they would in a real-ti
 full run takes about three to four minutes (five recordings, 426,544 samples at 330 Hz, four
 oscillators each). `--out` writes the per-stride MAE, the matched heel-strike offsets and the
 per-recording metrics as CSV files. `--device cpu|cuda` selects the device for the networks.
+All 40 compared values agree with the article at the printed precision, and the script exits
+with status 0 when they do.
 
-Expected output (abridged):
+<details>
+<summary>Expected output (abridged)</summary>
 
 ```text
 Headline numbers
@@ -188,10 +139,12 @@ Table 4: per-stride MAE by training exposure (rad)
 ```
 
 The script also prints the single-sensor results of Table 2 by session and the pooled temporal
-errors of all four configurations. All 40 compared values agree at the printed precision, and
-the script exits with status 0 when they do.
+errors of all four configurations.
 
-### Exactness
+</details>
+
+<details>
+<summary>Exactness and what is not included</summary>
 
 The release was checked against the analysis code used for the paper, recording by recording
 and array by array. From the dataset files, the bandpass signals, the FSR reference, the AO and
@@ -220,6 +173,8 @@ the initial window (it detects speed changes from the oscillator frequency), the
 gait-initiation and restart analyses, the
 statistical tests, and the ablation and leave-one-session-out studies.
 
+</details>
+
 ## Using the estimators
 
 ```python
@@ -245,7 +200,8 @@ phi_tcn = tcn.predict_standalone(tcn.load_model('standalone'), windows, len(t)) 
 signals from other hardware, feed bandpass-filtered signals in volts at 330 Hz with the primary
 (Gastrocnemius) channel first.
 
-Implementation conventions worth knowing when comparing with the equations of the paper:
+<details>
+<summary>Implementation conventions, compared with the equations of the paper</summary>
 
 - The phase error learner state φ_e tracks φ_ref − φ_AO and is added to the oscillator phase:
   φ_GP = (φ_AO + φ_e − φ_ref + φ_off) mod 2π.
@@ -255,12 +211,21 @@ Implementation conventions worth knowing when comparing with the equations of th
   held-out windows; the oscillator parameters only on its first 60 s (22 s at 4.0 and 38 s at
   4.5 km/h).
 
+</details>
+
 ## Retraining the networks
 
 ```bash
 python scripts/train_tcn.py --data path/to/Ferroelectret_FMG_Dataset --kind hybrid --out hybrid.pt
 python scripts/train_tcn.py --data path/to/Ferroelectret_FMG_Dataset --kind standalone --out tcn.pt
 ```
+
+The networks in `weights/` are the paper models: trained on the two 60 s speed ramps with two
+70 s windows of each ramp removed, which leaves 42,795 training windows. The windows were meant
+to hold out the 4.5 and 5.5 km/h steps but lie on the nominal protocol grid, which starts at
+the trim; the trims cut 37.9 s and 11.2 s into the first speed step (`step_onset_s` in
+`params/recordings.json`), so the windows span parts of two adjacent steps and every speed
+also occurs in training. Their central 40 s are the held-out windows of the paper.
 
 The script rebuilds the 42,795 training windows and trains with the settings of Table 1 (Adam,
 OneCycleLR with peak 3e-3, 300 epochs, batch 1024, amplitude scaling 0.05 to 5, 10 % channel
@@ -278,6 +243,38 @@ the Teensy 4.1, validated in the loop against the Python pipeline. Measured cost
 `embedded/RESULTS.md`. The TCN weight header in that folder predates the held-out-window
 retraining of the paper networks; `embedded/README.md` explains how to regenerate it from
 `weights/tcn_hybrid_7L48f.pt`.
+
+## Contents
+
+<details>
+<summary>Repository layout</summary>
+
+```text
+gaitphase/            Python package
+  data.py             load the TUdatalib CSVs, resample to 330 Hz, trim to the analysis window
+  preprocessing.py    causal bandpass (0.5-15 Hz), FSR heel-strike reference
+  oscillator.py       adaptive oscillator (RK4)
+  events.py           adaptive-threshold event detector
+  correction.py       phase error learner
+  estimator.py        AO and C-AO, sample by sample
+  tcn.py              network definitions, windowed inference, AO+TCN blend
+  metrics.py          continuous MAE/RMSE, direct MAE, ST-MAE, per-stride MAE, temporal error
+params/
+  estimator_params.json   optimized parameters of Table 1 at full precision
+  recordings.json         the five evaluated recordings: files, channel mapping, FSR thresholds, trims
+weights/
+  tcn_hybrid_7L48f.pt     AO+TCN network (state_dict, 71,099 parameters)
+  tcn_standalone_7L48f.pt TCN network (state_dict, 70,952 parameters)
+  tcn_config.json         architecture, training settings, checksums
+scripts/
+  reproduce.py            runs the four configurations and prints paper vs release values
+  train_tcn.py            retrains a network with the paper settings
+  make_animation.py       renders the two animations on this page (needs matplotlib and Pillow)
+embedded/                 C port for ESP32 and Teensy 4.1 (PlatformIO), see embedded/README.md
+docs/media/               README animations, trousers photo and block diagram from the article
+```
+
+</details>
 
 ## Citation
 
@@ -305,7 +302,8 @@ dataset is licensed separately under CC BY 4.0.
 Funded by the Deutsche Forschungsgemeinschaft (DFG), grant no. 450821862, within Research
 Training Group 2761.
 
-## Version history
+<details>
+<summary>Version history</summary>
 
 - 1.0.1 (November 2026): measured speed-step onsets of the three ramps (`step_onset_s` in
   `params/recordings.json`) for the steady and transition segments, and the held-out windows
@@ -314,3 +312,5 @@ Training Group 2761.
   `scripts/reproduce.py` now matches the article, so all 40 compared values agree.
 - 1.0.0 (2026): release accompanying the revised article. It replaces the initial release
   (packages `ao_gait_phase` and `tcn_hybrid`, May 2026), which remains in the git history.
+
+</details>
