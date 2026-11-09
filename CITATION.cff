@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 message: "If you use this code, please cite the article below."
-title: "trousers-ferroelectret-gait-phase: adaptive continuous gait phase estimation from textile-integrated ferroelectret sensors"
+title: "Gait Phase Estimation with Ferroelectret Trousers"
 repository-code: "https://github.com/TUDA-MUST/trousers-ferroelectret-gait-phase"
 type: software
 license: MIT

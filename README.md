@@ -1,4 +1,4 @@
-# trousers-ferroelectret-gait-phase
+# Gait Phase Estimation with Ferroelectret Trousers
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776ab)](#installation)
 [![License: MIT](https://img.shields.io/badge/license-MIT-2ea44f)](LICENSE)
